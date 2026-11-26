@@ -1,0 +1,1211 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteSecure | Online Voting System</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f4f7fb;
+    color: #26364a;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main { flex: 1; }
+
+header {
+    background: #142d4e;
+    color: white;
+    padding: 18px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+header h2 {
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-btn {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 7px 15px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.nav-btn:hover {
+    background: #f2b544;
+    color: #142d4e;
+    border-color: #f2b544;
+}
+
+.voter-badge {
+    background: #1e4270;
+    border: 1px solid #386fa4;
+    padding: 6px 13px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #f2b544;
+    display: none;
+}
+
+.stepper-wrapper {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px 8%;
+    display: none;
+    justify-content: center;
+}
+
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 650px;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.step-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.step-item.active { color: #142d4e; }
+.step-item.active .step-circle {
+    background: #176b87;
+    color: white;
+}
+
+.step-item.completed { color: #16834a; }
+.step-item.completed .step-circle {
+    background: #16834a;
+    color: white;
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background: #e2e8f0;
+}
+
+.step-view {
+    display: none;
+    animation: fadeSlide 0.35s ease;
+}
+
+.step-view.active-view { display: block; }
+
+@keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero {
+    background: linear-gradient(125deg,#142d4e,#2875a5);
+    color: white;
+    text-align: center;
+    padding: 95px 20px 80px;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 14px;
+}
+
+.hero p {
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto 32px;
+    opacity: 0.92;
+    line-height: 1.6;
+}
+
+.btn-primary {
+    background: #f2b544;
+    color: #142d4e;
+    padding: 15px 34px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+
+.btn-primary:hover {
+    background: #e5a632;
+    transform: translateY(-2px);
+}
+
+.how-it-works {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+    gap: 22px;
+    text-align: center;
+}
+
+.info-card {
+    background: white;
+    padding: 26px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+.info-card .icon {
+    font-size: 34px;
+    margin-bottom: 10px;
+}
+
+.info-card h3 {
+    color: #142d4e;
+    font-size: 17px;
+    margin-bottom: 6px;
+}
+
+.info-card p {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.section-container {
+    padding: 45px 8%;
+    text-align: center;
+}
+
+.section-container h2 {
+    color: #142d4e;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.section-sub {
+    color: #64748b;
+    margin-bottom: 28px;
+    font-size: 15px;
+}
+
+.auth-box {
+    background: white;
+    max-width: 450px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.07);
+    text-align: left;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 22px;
+}
+
+.tab-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    border-radius: 0;
+}
+
+.tab-btn:hover {
+    background: #f8fafc;
+    color: #142d4e;
+}
+
+.tab-btn.active {
+    color: #176b87;
+    border-bottom-color: #176b87;
+}
+
+.form-group { margin-bottom: 15px; }
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #176b87;
+}
+
+.id-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.gen-btn {
+    background: #e2e8f0;
+    color: #142d4e;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.gen-btn:hover { background: #cbd5e1; }
+
+button {
+    background: #176b87;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+button:hover { background: #124e67; }
+
+.full-btn {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.auth-msg {
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.active-voter-bar {
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    color: #0369a1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    max-width: 720px;
+    margin: 0 auto 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+}
+
+.logout-small {
+    background: #0284c7;
+    padding: 6px 14px;
+    font-size: 13px;
+}
+
+.candidates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(230px,1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    padding: 28px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-top: 4px solid #176b87;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+}
+
+.symbol {
+    font-size: 52px;
+    margin-bottom: 12px;
+}
+
+.card h3 {
+    color: #142d4e;
+    margin-bottom: 4px;
+}
+
+.party-name {
+    color: #176b87;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.manifesto-list {
+    list-style: none;
+    text-align: left;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 20px;
+}
+
+.manifesto-list li { margin-bottom: 6px; }
+.manifesto-list li:last-child { margin-bottom: 0; }
+
+.leader-banner {
+    background: linear-gradient(90deg,#142d4e,#176b87);
+    color: white;
+    padding: 14px 22px;
+    border-radius: 10px;
+    max-width: 850px;
+    margin: 0 auto 25px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(160px,1fr));
+    gap: 18px;
+    max-width: 950px;
+    margin: 0 auto 30px;
+}
+
+.stat {
+    background: white;
+    padding: 22px 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+}
+
+.stat h3 {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.stat p {
+    font-size: 28px;
+    color: #176b87;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.chart-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 850px;
+    margin: auto;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+
+.chart-card h3 {
+    color: #142d4e;
+    margin-bottom: 20px;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 360px;
+}
+
+.results-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.reset-btn {
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+}
+
+.reset-btn:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.65);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    padding: 20px;
+}
+
+.modal-box {
+    background: white;
+    max-width: 420px;
+    width: 100%;
+    padding: 30px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+}
+
+.receipt-ticket {
+    background: #f8fafc;
+    border: 2px dashed #94a3b8;
+    border-radius: 10px;
+    padding: 18px;
+    margin: 18px 0;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.btn-cancel:hover { background: #cbd5e1; }
+
+.toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #142d4e;
+    color: white;
+    padding: 14px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.3s;
+    pointer-events: none;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+footer {
+    background: #142d4e;
+    color: white;
+    text-align: center;
+    padding: 24px 20px;
+    margin-top: 40px;
+}
+
+footer p {
+    margin: 4px;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.admin-link {
+    color: #93c5fd;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 8px;
+    display: inline-block;
+}
+
+@media(max-width:650px) {
+    header {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .hero h1 { font-size: 30px; }
+    .step-item span { display: none; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2 onclick="goToStep('home')">🗳 VoteSecure</h2>
+    <div class="header-right">
+        <span id="headerVoterBadge" class="voter-badge"></span>
+        <button class="nav-btn" id="homeNavBtn" style="display:none;" onclick="goToStep('home')">← Back to Home</button>
+    </div>
+</header>
+
+<div class="stepper-wrapper" id="stepperWrapper">
+    <div class="stepper">
+        <div class="step-item" id="ind-auth">
+            <div class="step-circle">1</div>
+            <span>Verify Voter</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" id="ind-vote">
+            <div class="step-circle">2</div>
+            <span>Cast Ballot</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item" id="ind-results">
+            <div class="step-circle">3</div>
+            <span>Live Results</span>
+        </div>
+    </div>
+</div>
+
+<main>
+
+<div id="view-home" class="step-view active-view">
+    <div class="hero">
+        <h1>Your Vote, Your Voice, Your Future</h1>
+        <p>Welcome to VoteSecure. Verify your voter identity, review candidate manifestos, and cast a tamper-proof secret ballot in three simple steps.</p>
+        <button class="btn-primary" onclick="goToStep('auth')">Get Started →</button>
+    </div>
+
+    <div class="how-it-works">
+        <div class="info-card">
+            <div class="icon">🪪</div>
+            <h3>1. Voter Verification</h3>
+            <p>Register with your age (18+) to generate a unique Voter ID or log in with an existing ID.</p>
+        </div>
+        <div class="info-card">
+            <div class="icon">🗳️</div>
+            <h3>2. Secret Ballot</h3>
+            <p>Compare candidate manifestos and submit one verified vote per registered Voter ID.</p>
+        </div>
+        <div class="info-card">
+            <div class="icon">📊</div>
+            <h3>3. Instant Results</h3>
+            <p>Receive a digital receipt and unlock election analytics immediately after voting.</p>
+        </div>
+    </div>
+</div>
+
+<div id="view-auth" class="step-view">
+    <div class="section-container">
+        <h2>Step 1: Voter Verification</h2>
+        <p class="section-sub">New voters must sign up first (18+ years) to unlock the voting ballot.</p>
+
+        <div class="auth-box">
+            <div class="tabs">
+                <button class="tab-btn active" id="tabSignup" onclick="switchTab('signup')">New Sign Up</button>
+                <button class="tab-btn" id="tabLogin" onclick="switchTab('login')">Voter Login</button>
+            </div>
+
+            <div id="signupForm">
+                <div class="form-group">
+                    <label for="regName">Full Name</label>
+                    <input type="text" id="regName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="regAge">Age (Minimum 18)</label>
+                    <input type="number" id="regAge" placeholder="Enter your age" min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label for="regVoterId">Create or Generate Voter ID</label>
+                    <div class="id-input-row">
+                        <input type="text" id="regVoterId" placeholder="VS-2026-XXXX">
+                        <button type="button" class="gen-btn" onclick="generateVoterId()">Auto ID</button>
+                    </div>
+                </div>
+                <button class="full-btn" onclick="registerVoter()">Register & Continue →</button>
+                <p class="auth-msg" id="signupMessage"></p>
+            </div>
+
+            <div id="loginForm" style="display:none;">
+                <div class="form-group">
+                    <label for="loginVoterId">Registered Voter ID</label>
+                    <input type="text" id="loginVoterId" placeholder="e.g. VS-2026-4821">
+                </div>
+                <button class="full-btn" onclick="loginVoter()">Verify & Open Ballot →</button>
+                <p class="auth-msg" id="loginMessage"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="view-vote" class="step-view">
+    <div class="section-container">
+        <h2>Step 2: Official Ballot Paper</h2>
+        <p class="section-sub">Review each candidate's manifesto and select your choice.</p>
+
+        <div class="active-voter-bar">
+            <span>✅ Verified Voter: <strong id="activeVoterName"></strong> (<span id="activeVoterIdText"></span>)</span>
+            <button class="logout-small" onclick="logoutVoter()">Switch Voter</button>
+        </div>
+
+        <div class="candidates">
+
+            <div class="card">
+                <div>
+                    <div class="symbol">🌳</div>
+                    <h3>Candidate A</h3>
+                    <p class="party-name">Green Development Party</p>
+                    <ul class="manifesto-list">
+                        <li>• 100% solar micro-grids for campuses</li>
+                        <li>• Urban tree-cover & clean water expansion</li>
+                        <li>• Green tech startup incubation grants</li>
+                    </ul>
+                </div>
+                <button onclick="openConfirmModal('A','Candidate A (Green Development Party)')">Vote for Candidate A</button>
+            </div>
+
+            <div class="card">
+                <div>
+                    <div class="symbol">⭐</div>
+                    <h3>Candidate B</h3>
+                    <p class="party-name">Progressive Future Party</p>
+                    <ul class="manifesto-list">
+                        <li>• Free high-speed public Wi-Fi zones</li>
+                        <li>• Digital skill & AI literacy fellowships</li>
+                        <li>• Smart public transit modernization</li>
+                    </ul>
+                </div>
+                <button onclick="openConfirmModal('B','Candidate B (Progressive Future Party)')">Vote for Candidate B</button>
+            </div>
+
+            <div class="card">
+                <div>
+                    <div class="symbol">🌸</div>
+                    <h3>Candidate C</h3>
+                    <p class="party-name">People's Welfare Party</p>
+                    <ul class="manifesto-list">
+                        <li>• Subsidized healthcare & wellness clinics</li>
+                        <li>• Affordable student housing initiatives</li>
+                        <li>• Small business zero-interest micro-loans</li>
+                    </ul>
+                </div>
+                <button onclick="openConfirmModal('C','Candidate C (People\\'s Welfare Party)')">Vote for Candidate C</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="view-results" class="step-view">
+    <div class="section-container">
+        <h2>Step 3: Live Election Results</h2>
+        <p class="section-sub">Your vote has been recorded. Here are the live standings.</p>
+
+        <div class="leader-banner">
+            <span id="leaderText">🏆 Leading: Waiting for votes</span>
+            <span id="turnoutText">📊 Turnout: 0% (0 / 0 Registered)</span>
+        </div>
+
+        <div class="dashboard">
+            <div class="stat">
+                <h3>Total Votes</h3>
+                <p id="totalVotes">0</p>
+            </div>
+            <div class="stat">
+                <h3>Candidate A</h3>
+                <p id="votesA">0</p>
+            </div>
+            <div class="stat">
+                <h3>Candidate B</h3>
+                <p id="votesB">0</p>
+            </div>
+            <div class="stat">
+                <h3>Candidate C</h3>
+                <p id="votesC">0</p>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Candidate-wise Vote Distribution</h3>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <div class="results-actions">
+            <button class="btn-primary" onclick="goToStep('home')">Next Voter (Return Home)</button>
+            <button class="reset-btn" onclick="resetElectionDemo()">⚙️ Admin: Reset All Data</button>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <h3 style="color:#142d4e;margin-bottom:10px;">Confirm Your Ballot</h3>
+        <p style="color:#475569;font-size:15px;">You are about to cast your final vote for:</p>
+        <p id="confirmCandidateName" style="font-weight:bold;color:#176b87;font-size:18px;margin:14px 0;"></p>
+        <p style="font-size:13px;color:#dc2626;">⚠️ Once submitted, your Voter ID will be locked and cannot vote again.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+            <button onclick="submitConfirmedVote()">Confirm & Submit</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="receiptModal">
+    <div class="modal-box">
+        <div style="font-size:42px;margin-bottom:8px;">✅</div>
+        <h3 style="color:#16834a;">Vote Recorded Successfully!</h3>
+        <p style="font-size:13px;color:#64748b;margin-top:4px;">Your ballot choice remains secret.</p>
+        <div class="receipt-ticket" id="receiptDetails"></div>
+        <button class="full-btn" onclick="closeReceiptModal()">Unlock Live Results →</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+    <h3>VoteSecure</h3>
+    <p>Online Voting & Election Analytics System • © 2026</p>
+    <span class="admin-link" onclick="openAdminResults()">Admin: View Results Directly</span>
+</footer>
+
+<script>
+
+// LOCAL STORAGE INITIALIZATION
+let votes = JSON.parse(localStorage.getItem("vs_votes")) || {
+    A: 0,
+    B: 0,
+    C: 0
+};
+
+// Remove old NOTA data from previous versions
+delete votes.NOTA;
+localStorage.setItem("vs_votes", JSON.stringify(votes));
+
+let registeredVoters = JSON.parse(localStorage.getItem("vs_voters")) || {};
+let currentVoterId = null;
+let pendingCandidateKey = null;
+
+// STEP NAVIGATION
+function goToStep(step) {
+
+    if (step === "vote" && !currentVoterId) {
+        showToast("⚠️ Please register or login first.");
+        step = "auth";
+    }
+
+    document.querySelectorAll(".step-view").forEach(el =>
+        el.classList.remove("active-view")
+    );
+
+    document.getElementById(`view-${step}`).classList.add("active-view");
+
+    const stepper = document.getElementById("stepperWrapper");
+    const homeBtn = document.getElementById("homeNavBtn");
+
+    if (step === "home") {
+        stepper.style.display = "none";
+        homeBtn.style.display = "none";
+    } else {
+        stepper.style.display = "flex";
+        homeBtn.style.display = "inline-block";
+        updateStepperUI(step);
+    }
+
+    if (step === "results") {
+        updateDashboard();
+        setTimeout(() => barChart.resize(), 50);
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function updateStepperUI(activeStep) {
+    const order = ["auth","vote","results"];
+    const activeIndex = order.indexOf(activeStep);
+
+    order.forEach((stepName,index) => {
+        const el = document.getElementById(`ind-${stepName}`);
+        el.classList.remove("active","completed");
+
+        if (index < activeIndex) {
+            el.classList.add("completed");
+        } else if (index === activeIndex) {
+            el.classList.add("active");
+        }
+    });
+}
+
+// TOAST
+function showToast(msg) {
+    const toast = document.getElementById("toast");
+    toast.innerText = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"),3200);
+}
+
+// SWITCH TABS
+function switchTab(tab) {
+    document.getElementById("loginMessage").innerText = "";
+    document.getElementById("signupMessage").innerText = "";
+
+    if (tab === "login") {
+        document.getElementById("loginForm").style.display = "block";
+        document.getElementById("signupForm").style.display = "none";
+        document.getElementById("tabLogin").classList.add("active");
+        document.getElementById("tabSignup").classList.remove("active");
+    } else {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("signupForm").style.display = "block";
+        document.getElementById("tabSignup").classList.add("active");
+        document.getElementById("tabLogin").classList.remove("active");
+    }
+}
+
+// GENERATE VOTER ID
+function generateVoterId() {
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    document.getElementById("regVoterId").value = `VS-2026-${randomDigits}`;
+}
+
+// REGISTER VOTER
+function registerVoter() {
+    const name = document.getElementById("regName").value.trim();
+    const age = parseInt(document.getElementById("regAge").value,10);
+    const voterId = document.getElementById("regVoterId").value.trim().toUpperCase();
+    const msgEl = document.getElementById("signupMessage");
+
+    if (!name || !age || !voterId) {
+        msgEl.style.color = "#dc2626";
+        msgEl.innerText = "Please fill in all fields to register.";
+        return;
+    }
+
+    if (age < 18 || age > 120) {
+        msgEl.style.color = "#dc2626";
+        msgEl.innerText = "Eligibility Error: You must be at least 18 years old.";
+        return;
+    }
+
+    if (registeredVoters[voterId]) {
+        msgEl.style.color = "#dc2626";
+        msgEl.innerText = "This Voter ID is already registered. Click 'Auto ID' for a new one.";
+        return;
+    }
+
+    registeredVoters[voterId] = {
+        name: name,
+        age: age,
+        hasVoted: false
+    };
+
+    localStorage.setItem("vs_voters",JSON.stringify(registeredVoters));
+
+    document.getElementById("regName").value = "";
+    document.getElementById("regAge").value = "";
+    document.getElementById("regVoterId").value = "";
+
+    startVoterSession(voterId);
+    showToast(`Welcome ${name}! Ballot unlocked.`);
+}
+
+// LOGIN VOTER
+function loginVoter() {
+    const voterId = document.getElementById("loginVoterId").value.trim().toUpperCase();
+    const msgEl = document.getElementById("loginMessage");
+
+    if (!voterId) {
+        msgEl.style.color = "#dc2626";
+        msgEl.innerText = "Please enter your Voter ID.";
+        return;
+    }
+
+    const voter = registeredVoters[voterId];
+
+    if (!voter) {
+        msgEl.style.color = "#dc2626";
+        msgEl.innerText = "Voter ID not found. Please register under 'New Sign Up'.";
+        return;
+    }
+
+    if (voter.hasVoted) {
+        msgEl.style.color = "#d97706";
+        msgEl.innerText = `Access Denied: ${voter.name} (${voterId}) has already cast a vote.`;
+        return;
+    }
+
+    document.getElementById("loginVoterId").value = "";
+    startVoterSession(voterId);
+    showToast(`Verified: ${voter.name}`);
+}
+
+// START VOTER SESSION
+function startVoterSession(voterId) {
+    currentVoterId = voterId;
+    const voter = registeredVoters[voterId];
+
+    document.getElementById("activeVoterName").innerText = voter.name;
+    document.getElementById("activeVoterIdText").innerText = voterId;
+
+    const badge = document.getElementById("headerVoterBadge");
+    badge.style.display = "inline-block";
+    badge.innerText = `ID: ${voterId}`;
+
+    goToStep("vote");
+}
+
+// LOGOUT
+function logoutVoter() {
+    currentVoterId = null;
+    document.getElementById("headerVoterBadge").style.display = "none";
+    document.getElementById("loginMessage").innerText = "";
+    document.getElementById("signupMessage").innerText = "";
+    goToStep("auth");
+}
+
+// CONFIRMATION MODAL
+function openConfirmModal(candidateKey,candidateLabel) {
+    if (!currentVoterId) {
+        goToStep("auth");
+        return;
+    }
+
+    pendingCandidateKey = candidateKey;
+    document.getElementById("confirmCandidateName").innerText = candidateLabel;
+    document.getElementById("confirmModal").style.display = "flex";
+}
+
+function closeConfirmModal() {
+    pendingCandidateKey = null;
+    document.getElementById("confirmModal").style.display = "none";
+}
+
+// SUBMIT VOTE
+function submitConfirmedVote() {
+    if (!currentVoterId || !pendingCandidateKey) return;
+
+    const voter = registeredVoters[currentVoterId];
+
+    if (voter.hasVoted) {
+        showToast("This Voter ID has already voted.");
+        closeConfirmModal();
+        return;
+    }
+
+    votes[pendingCandidateKey]++;
+    localStorage.setItem("vs_votes",JSON.stringify(votes));
+
+    voter.hasVoted = true;
+    localStorage.setItem("vs_voters",JSON.stringify(registeredVoters));
+
+    const txHash = "0x" +
+        Math.random().toString(16).substring(2,10).toUpperCase() +
+        Date.now().toString(16).slice(-4).toUpperCase();
+
+    const timestamp = new Date().toLocaleString();
+
+    document.getElementById("receiptDetails").innerHTML = `
+        <strong>Voter Name:</strong> ${voter.name}<br>
+        <strong>Voter ID:</strong> ${currentVoterId}<br>
+        <strong>Status:</strong> Verified & Counted<br>
+        <strong>Timestamp:</strong> ${timestamp}<br>
+        <strong>Receipt Hash:</strong> <code>${txHash}</code>
+    `;
+
+    currentVoterId = null;
+    document.getElementById("headerVoterBadge").style.display = "none";
+
+    closeConfirmModal();
+    document.getElementById("receiptModal").style.display = "flex";
+}
+
+// CLOSE RECEIPT
+function closeReceiptModal() {
+    document.getElementById("receiptModal").style.display = "none";
+    goToStep("results");
+}
+
+// CHART.JS SETUP
+const barChart = new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    data: {
+        labels: ["Candidate A","Candidate B","Candidate C"],
+        datasets: [{
+            label: "Number of Votes",
+            data: [votes.A,votes.B,votes.C],
+            backgroundColor: ["#176B87","#F2B544","#8E6BC7"],
+            borderRadius: 8,
+            barThickness: 50
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0, stepSize: 1 },
+                title: { display: true, text: "Votes Cast" }
+            },
+            x: {
+                title: { display: true, text: "Ballot Options" }
+            }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+
+// UPDATE DASHBOARD
+function updateDashboard() {
+    const total = votes.A + votes.B + votes.C;
+    const totalRegistered = Object.keys(registeredVoters).length;
+    const turnoutPct = totalRegistered > 0
+        ? Math.round((total / totalRegistered) * 100)
+        : 0;
+
+    document.getElementById("totalVotes").innerText = total;
+    document.getElementById("votesA").innerText = votes.A;
+    document.getElementById("votesB").innerText = votes.B;
+    document.getElementById("votesC").innerText = votes.C;
+
+    document.getElementById("turnoutText").innerText =
+        `📊 Turnout: ${turnoutPct}% (${total} / ${totalRegistered} Registered)`;
+
+    const candidateScores = [
+        { name: "Candidate A", count: votes.A },
+        { name: "Candidate B", count: votes.B },
+        { name: "Candidate C", count: votes.C }
+    ];
+
+    candidateScores.sort((a,b) => b.count-a.count);
+
+    const leaderEl = document.getElementById("leaderText");
+
+    if (total === 0) {
+        leaderEl.innerText = "🏆 Leading: Waiting for votes";
+    } else if (candidateScores[0].count === candidateScores[1].count) {
+        leaderEl.innerText =
+            `⚖️ Current Status: Tied at ${candidateScores[0].count} vote(s)`;
+    } else {
+        leaderEl.innerText =
+            `🏆 Leading: ${candidateScores[0].name} (${candidateScores[0].count} votes)`;
+    }
+
+    barChart.data.datasets[0].data = [
+        votes.A,
+        votes.B,
+        votes.C
+    ];
+
+    barChart.update();
+}
+
+// ADMIN RESULTS
+function openAdminResults() {
+    const pass = prompt(
+        "Enter Admin Password to view live results (Demo password: admin123):"
+    );
+
+    if (pass === "admin123") {
+        goToStep("results");
+    } else if (pass !== null) {
+        showToast("❌ Incorrect Admin Password.");
+    }
+}
+
+// ADMIN RESET
+function resetElectionDemo() {
+    const pass = prompt(
+        "Enter Admin Password to reset all votes & registered users (Demo password: admin123):"
+    );
+
+    if (pass === "admin123") {
+        localStorage.removeItem("vs_votes");
+        localStorage.removeItem("vs_voters");
+
+        votes = { A: 0, B: 0, C: 0 };
+        registeredVoters = {};
+        currentVoterId = null;
+
+        document.getElementById("headerVoterBadge").style.display = "none";
+
+        updateDashboard();
+        showToast("All election data has been cleared.");
+        goToStep("home");
+
+    } else if (pass !== null) {
+        showToast("❌ Incorrect Admin Password.");
+    }
+}
+
+</script>
+</body>
+</html>
